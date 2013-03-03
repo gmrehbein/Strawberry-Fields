@@ -15,6 +15,8 @@ Input is a an integer denoting the maximum number of greenhouses to consider and
 in which the '@' symbol represents a strawberry. Output is the original matrix with letters used to represent greenhouses
 along with the covering's total cost.
 
+Example:
+See strawberries.txt and optimal_covering.txt in this repository for an example input-output pair.
 
 
 Solution:
