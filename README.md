@@ -1,9 +1,12 @@
 Strawberry-Fields
 =================
 
-Fast C++ 2-phase approximation algorithm solution to Google-ITA's Strawberry Fields problem:
+Solution to Google-ITA's Strawberry Fields problem:
 
 http://www.itasoftware.com/careers/puzzle_archive.html
+
+The algorithm is fast two-phase approximation algorithm based on greedy matching followed by local search
+and is implemented in C++ with extensive use of STL and Boost.
 
 To compile and run, simply unpack the tar bundle, cd into the Strawberry Fields directory, and type 'make' at the command line. The Makefile assumes a reasonably up to date C++ compiler (no use of C++11 features was made) as well as a Boost installation in the canonical search path. The executable is 'strawberryfields' and is invoked as follows:
 
@@ -46,7 +49,7 @@ shade.h/cc - fundamental objects used to determine globally optimal cost and/or 
 Boost Dependencies
 The following Boost modules are used. The only link-time dependency is program_options, the rest are header-only:
 
-dynamic_bitset\n
+dynamic_bitset
 foreach
 iterator_range
 program_options
