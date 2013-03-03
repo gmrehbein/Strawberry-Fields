@@ -46,7 +46,7 @@ shade.h/cc - fundamental objects used to determine globally optimal cost and/or 
 Boost Dependencies
 The following Boost modules are used. The only link-time dependency is program_options, the rest are header-only:
 
-dynamic_bitset
+dynamic_bitset\n
 foreach
 iterator_range
 program_options
