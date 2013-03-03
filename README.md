@@ -6,7 +6,8 @@ Solution to Google-ITA's Strawberry Fields problem:
 http://www.itasoftware.com/careers/puzzle_archive.html
 
 
-Problem: Strawberries are growing in a rectangular field of length and width at most 50. You want to build greenhouses
+Problem: 
+Strawberries are growing in a rectangular field of length and width at most 50. You want to build greenhouses
 to enclose the strawberries. Greenhouses are axis-aligned with the field (i.e. not diagonal), and may not overlap.
 The cost of each greenhouse is $10 plus $1 per unit are covered. Write a program that chooses the best number
 of greenhouses to build, and their locations, so as to enclose all the strawberries as cheaply as possible.
@@ -14,18 +15,9 @@ Input is a an integer denoting the maximum number of greenhouses to consider and
 in which the '@' symbol represents a strawberry. Output is the original matrix with letters used to represent greenhouses
 along with the covering's total cost.
 
-Cardinality:3
-Cost:90
-======================
-..CCCCCCCC............
-..CCCCCCCC......BBB...
-..CCCCCCCC......BBB...
-.......AAAAAAAAABBB...
-.......AAAAAAAAA......
-.......AAAAAAAAA......
 
 
-
+Solution:
 The algorithm is fast two-phase approximation algorithm based on greedy matching followed by local search
 and is implemented in C++ with extensive use of STL and Boost.
 
