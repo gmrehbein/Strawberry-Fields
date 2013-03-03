@@ -50,7 +50,7 @@ Algorithm
 
 Implementation:
 
-1070 lines of C++ code:
+1070 lines of C++ code
 
 main.cc - main() driver handles argument processing and input of strawberry field, instantiates and runs the optimizer
 
