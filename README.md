@@ -75,3 +75,9 @@ singleton_pool
 tuple
 utility
 unordered_map
+
+
+TO-DO:
+
+Remove sort bias at the beginning of greedy match phase by examining the 8-fold symmetry of a field under the action of the Dihedral group D4. Assign each symmetry a thread to run the optimizer pipeline and compare the results at the end of their runs. Transform the best result under its group inverse to recover a potentially more optimal solution than extracted from an untransformed field alone. 
+
