@@ -37,6 +37,7 @@ Default arguments are shown in parentheses. I have deliberately kept the complex
 The algorithm and its implementation are described in more detail below:
 
 Algorithm
+
 0. main() handles argument processing, instantiates the optimizer, reads in the strawberry fields and cardinality constraints defined in the input file, and runs the optimizer on each one in turn
 
 1. Optimizer::generateRectangles() - for an m X n strawberry field, there are C(mn+1,2) - C(m,2)C(n,2) distinct rectangles where C(k,2) is the binomial coefficient enumerating k objects taken 2 at a time. The weight of a rectangle is how many strawberries it covers. We generate the poset of all rectangles along chains (i.e. totally ordered subsets) R_1 < R_2 < ..... < R_m where '<' is the subset relation, discarding those rectangles R_k for which weight(R_k) == weight(R_k-1). The resulting set of rectangles is sorted in ascending weight-to-cost ratio. 
