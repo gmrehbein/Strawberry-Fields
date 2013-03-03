@@ -46,7 +46,8 @@ rectangle.h/cc - fundamental lightweight object created and manipulated by the o
 shade.h/cc - fundamental objects used to determine globally optimal cost and/or cardinality decreasing gradients during the optimizer's localSearch() phase. Shades consist of two rectangles, their join, two sets of rectangles from the result set (the envelope and penumbra) possessing "nice" intersection properties with the join, together with ordinal and gradient functions
 
 
-Boost Dependencies
+Boost Dependencies:
+
 The following Boost modules are used. The only link-time dependency is program_options, the rest are header-only:
 
 dynamic_bitset
