@@ -54,7 +54,7 @@ Implementation:
 
 main.cc - main() driver handles argument processing and input of strawberry field, instantiates and runs the optimizer
 
-global.h/cc - singleton structure containing data structures for the strawberry field, input and output file pathnames, and the pool interface for creating and destroying rectangles
+global.h/cc - struct of statics containing shared data structures for the strawberry field, input and output file pathnames, and the pool interface for creating and destroying rectangles
 
 optimizer.h/cc - implements the optimizing pipeline and prints the result to the output file
 
