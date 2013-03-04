@@ -58,7 +58,7 @@ global.h/cc - scope containing the strawberry field, input and output file pathn
 
 optimizer.h/cc - implements the optimizing pipeline and prints the result to the output file
 
-rectangle.h/cc - fundamental lightweight object created and manipulated by the optimizer; rectangles are completely specified by 2 pairs of integers and all set operations on the span of a rectangle are implemented using boost::dynamic_bitset<>. The span is computed lazily and all rectangles are created using Global::rectanglePool, memory for which is freed at the end each optimizer run.
+rectangle.h/cc - fundamental lightweight object created and manipulated by the optimizer; rectangles are completely specified by 2 pairs of integers and all set operations on the span of a rectangle are implemented using boost::dynamic_bitset<>. The span is computed lazily and all rectangles are created using Global::rectanglePool, memory for which is freed at the end of each optimizer run.
 
 shade.h/cc - fundamental objects used to determine globally optimal cost and/or cardinality decreasing gradients during the optimizer's localSearch() phase. Shades consist of two rectangles, their join, two sets of rectangles from the result set (the envelope and penumbra) possessing "nice" intersection properties with the join, together with ordinal and gradient functions
 
