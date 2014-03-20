@@ -23,7 +23,7 @@
 Shade::Shade(Rectangle* r1, Rectangle* r2, Rectangle* join)
 {
   assert(r1 != NULL);
-  assert(r1 != NULL);
+  assert(r2 != NULL);
   assert(join != NULL);
   m_r1 = r1;
   m_r2 = r2;
