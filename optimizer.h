@@ -49,7 +49,6 @@ private:
   Rectangle* joinRectangles(const Rectangle*, const Rectangle*);
 
   size_t m_maxRectangles;
-  size_t m_totalCost;
   std::vector<Rectangle* > m_rectangles;
   std::list<Rectangle*> m_result;
   boost::dynamic_bitset<> m_covering;
