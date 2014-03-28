@@ -50,8 +50,6 @@ Algorithm
 
 Implementation:
 
-1070 lines of C++ code
-
 main.cc - main() driver handles argument processing and input of strawberry field, instantiates and runs the optimizer
 
 global.h/cc - scope containing the strawberry field, input and output file pathnames, and the pool interface for creating and destroying rectangles
