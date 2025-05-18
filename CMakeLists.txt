@@ -61,12 +61,9 @@ if(Boost_FOUND)
   target_link_libraries(strawberryfields PRIVATE ${Boost_LIBRARIES})
 endif()
 
-# clang-tidy integration (optional)
+
+# Optional clang-tidy discovery
 find_program(CLANG_TIDY_EXE NAMES "clang-tidy")
 if(CLANG_TIDY_EXE)
   message(STATUS "clang-tidy found: ${CLANG_TIDY_EXE}")
-  set_target_properties(
-    strawberryfields PROPERTIES
-    CXX_CLANG_TIDY "${CLANG_TIDY_EXE};-checks=*,-clang-analyzer-alpha.*"
-  )
 endif()
