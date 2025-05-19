@@ -10,28 +10,16 @@
 
 // C
 #include <cassert>
-#include <cstdio>
 
-// BOOST
-#include <boost/foreach.hpp>
-#include <boost/tuple/tuple.hpp>
-
+// Local
 #include "rectangle.h"
 
-#define foreach BOOST_FOREACH
-
 Shade::Shade(Rectangle* r1, Rectangle* r2, Rectangle* join)
+: rec1(r1), rec2(r2), join(join)
 {
-  assert(r1 != NULL);
-  assert(r2 != NULL);
-  assert(join != NULL);
-  m_r1 = r1;
-  m_r2 = r2;
-  m_join = join;
-}
-
-Shade::~Shade()
-{
+  assert(rec1 != nullptr);
+  assert(rec2 != nullptr);
+  assert(join != nullptr);
 }
 
 //--------------------------------------------------
@@ -44,15 +32,17 @@ int Shade::penalty() const
 {
   int envelopeCost = 0;
   int penumbraCost = 0;
-  foreach(Rectangle* r, envelope) {
-    assert(r != NULL);
-    envelopeCost += r->cost();
+
+  for (auto rec : envelope) {
+    assert(rec != nullptr);
+    envelopeCost += rec->cost();
   }
-  Rectangle *original, *slice;
-  foreach(boost::tie(original, slice), penumbra) {
+
+  for (auto [original, slice] : penumbra) {
     penumbraCost += original->area() - slice->area();
   }
-  int penalty = m_join->cost() - (m_r1->cost() + m_r2->cost() + envelopeCost + penumbraCost);
+
+  int penalty = join->cost() - (rec1->cost() + rec2->cost() + envelopeCost + penumbraCost);
   return penalty;
 }
 
@@ -68,5 +58,3 @@ bool Shade::operator< (const Shade &other) const
   return penalty() == other.penalty() ?
          envelope.size() < other.envelope.size() : penalty() < other.penalty();
 }
-
-#undef foreach

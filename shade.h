@@ -15,22 +15,21 @@
 //  Copyright (C) 2012 Gregory Rehbein <gmrehbein@gmail.com>
 // -----------------------------------------------------------
 
-#ifndef SHADE_H
-#define SHADE_H
+#pragma once
 
 #include <vector>
-#include <boost/unordered_map.hpp>
+#include <unordered_map>
 
 class Rectangle;
 
 struct Shade {
-  Rectangle* m_r1;
-  Rectangle* m_r2;
-  Rectangle* m_join;
+  Rectangle* rec1;
+  Rectangle* rec2;
+  Rectangle* join;
 
   //-----------------------------------
   // Set of rectangles which lie
-  // completely inside m_join
+  // completely inside join
   //-----------------------------------
   std::vector<Rectangle*> envelope;
 
@@ -40,13 +39,10 @@ struct Shade {
   // represented as a map from a rectangle to its
   // shaded portion
   //------------------------------------
-  boost::unordered_map<Rectangle*, Rectangle*> penumbra;
+  std::unordered_map<Rectangle*, Rectangle*> penumbra;
 
   Shade(Rectangle* r1, Rectangle* r2, Rectangle* join);
-  ~Shade();
 
-  int penalty() const;
+  [[nodiscard]] int penalty() const;
   bool operator< (const Shade &other) const;
 };
-
-#endif

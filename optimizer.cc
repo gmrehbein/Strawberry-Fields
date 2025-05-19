@@ -440,9 +440,9 @@ void Optimizer::localSearch()
   shades.sort();
   const Shade& best = shades.front();
   if (best.penalty() <= 0 || m_result.size() > m_maxRectangles) {
-    m_result.remove(best.m_r1);
-    m_result.remove(best.m_r2);
-    m_result.push_back(best.m_join);
+    m_result.remove(best.rec1);
+    m_result.remove(best.rec2);
+    m_result.push_back(best.join);
     foreach(Rectangle* r, best.envelope) {
       m_result.remove(r);
     }
