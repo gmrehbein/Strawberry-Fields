@@ -9,49 +9,40 @@
 #include "rectangle.h"
 #include "global.h"
 #include <cassert>
-#include <utility>
 
 using std::make_pair;
 
-Rectangle::Rectangle(int topLeftRow, int topLeftColumn,
-                     int bottomRightRow, int bottomRightColumn)
-  :m_topLeft(make_pair(topLeftRow, topLeftColumn)),
-   m_bottomRight(make_pair(bottomRightRow, bottomRightColumn)),
-   m_area(((bottomRightColumn - topLeftColumn) + 1)*((bottomRightRow - topLeftRow) + 1)),
-   m_weight(Global::weightOfRectangle(topLeftRow, topLeftColumn, bottomRightRow, bottomRightColumn)),
-   m_spun(false)
+Rectangle::Rectangle(int x0, int y0, int x1, int y1)
+  : Rectangle(x0, y0, x1, y1, Global::weightOfRectangle(x0, y0, x1, y1))
 {
-  assert(m_area > 0);
-  m_weightToCostRatio = double(m_weight)/(10 + m_area);
 }
 
-Rectangle::Rectangle(int topLeftRow, int topLeftColumn,
-                     int bottomRightRow, int bottomRightColumn,int weight)
-  :m_topLeft(make_pair(topLeftRow, topLeftColumn)),
-   m_bottomRight(make_pair(bottomRightRow, bottomRightColumn)),
-   m_area(((bottomRightColumn - topLeftColumn) + 1)*((bottomRightRow - topLeftRow) + 1)),
-   m_weight(weight), m_spun(false)
+Rectangle::Rectangle(int x0, int y0,
+                     int x1, int y1,int weight)
+: bounds_(std::make_tuple(x0,y0,x1,y1)),
+   area_((y1 - y0 + 1)*(x1 - x0 + 1)),
+   weight_(weight)
 {
-  assert(m_area > 0);
-  m_weightToCostRatio = double(m_weight)/(10 + m_area);
-}
-
-Rectangle::~Rectangle()
-{
+  assert(area_ > 0);
+  weightToCostRatio_ = double(weight_)/(10 + area_);
 }
 
 void Rectangle::makeSpan()
 {
-  if (!m_spun) {
-    m_span.resize(Global::numRows*Global::numColumns);
-    for (int i = m_topLeft.first; i <= m_bottomRight.first; ++i)
-      for (int j = m_topLeft.second; j <= m_bottomRight.second; ++j)
-        m_span.set(i*Global::numColumns + j);
-    m_spun = true;
-  }
+  if (spun_) return;
+
+  span_.resize(Global::numRows * Global::numColumns);
+  auto [x0,y0,x1,y1] = bounds_;
+  for (int x = x0; x <= x1; ++x) {
+      for (int y = y0; y <= y1; ++y) {
+          span_.set(Global::numColumns * x + y);
+      }
+   }
+
+  spun_ = true;
 }
 
-bool Rectangle::better(const Rectangle* r1, const Rectangle* r2)
+bool Rectangle::better(const Rectangle* rect1, const Rectangle* rect2)
 {
-  return *r1 < *r2;
+  return *rect1 < *rect2;
 }

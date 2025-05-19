@@ -5,73 +5,81 @@
 //  Copyright (C) 2012 Gregory Rehbein <gmrehbein@gmail.com>
 // -----------------------------------------------------------
 
-#ifndef RECTANGLE_H
-#define RECTANGLE_H
+#pragma once
 
-#include <utility>
+#include <tuple>
 #include <boost/dynamic_bitset.hpp>
 
 class Rectangle
 {
-  std::pair<int,int> m_topLeft;
-  std::pair<int,int> m_bottomRight;
-  size_t m_area;
-  size_t m_weight;
-  double m_weightToCostRatio;
+  std::tuple<int,int,int,int> bounds_;
+  size_t area_;
+  size_t weight_;
+  double weightToCostRatio_;
 
-  char m_label;
-  boost::dynamic_bitset<> m_span;
-  bool m_spun;
+  char label_;
+  boost::dynamic_bitset<> span_;
+  bool spun_ = false;
 
 public:
 
-  Rectangle(int topLeftRow, int topLeftColumn,
-            int bottomRightRow, int bottomRightColumn);
-  Rectangle(int topLeftRow, int topLeftColumn,
-            int bottomRightRow, int bottomRightColumn, int weight);
-  ~Rectangle();
+  Rectangle(int x0, int y0, int x1, int y1);
+  Rectangle(int x0, int y0, int x1, int y1, int weight);
 
-  inline size_t area() const {
-    return m_area;
+  [[nodiscard]] size_t area() const {
+    return area_;
   }
-  inline size_t cost() const {
-    return 10 + m_area;
+
+  [[nodiscard]] size_t cost() const {
+    return 10 + area_;
   }
-  inline char label() const {
-    return m_label;
+
+  [[nodiscard]] char label() const {
+    return label_;
   }
-  inline size_t weight() const {
-    return m_weight;
+
+  [[nodiscard]] size_t weight() const {
+    return weight_;
   }
-  inline double weightToCostRatio() const {
-    return m_weightToCostRatio;
+
+  [[nodiscard]] double weightToCostRatio() const {
+    return weightToCostRatio_;
   }
-  inline int topLeftRow() const {
-    return m_topLeft.first;
+
+  [[nodiscard]] int topLeftRow() const {
+    return std::get<0>(bounds_);
   }
-  inline int topLeftColumn() const {
-    return m_topLeft.second;
+
+  [[nodiscard]] int topLeftColumn() const {
+    return std::get<1>(bounds_);
   }
-  inline int bottomRightRow() const {
-    return m_bottomRight.first;
+
+  [[nodiscard]] int bottomRightRow() const {
+    return std::get<2>(bounds_);
   }
-  inline int bottomRightColumn() const {
-    return m_bottomRight.second;
+
+  [[nodiscard]] int bottomRightColumn() const {
+    return std::get<3>(bounds_);
   }
-  inline bool intersects(const Rectangle* other) const {
-    return m_span.intersects(other->m_span);
+
+  [[nodiscard]] bool intersects(const Rectangle* other) const {
+    return span_.intersects(other->span_);
   }
-  inline bool isSubsetOf(const Rectangle* other) const {
-    return m_span.is_subset_of(other->m_span);
+
+  [[nodiscard]] bool isSubsetOf(const Rectangle* other) const {
+    return span_.is_subset_of(other->span_);
   }
-  inline const boost::dynamic_bitset<>& span() const {
-    return m_span;
+
+  [[nodiscard]] const boost::dynamic_bitset<>& span() const {
+    return span_;
   }
-  inline bool operator< (const Rectangle& other) const {
-    return m_weightToCostRatio < other.m_weightToCostRatio;
+
+  bool operator< (const Rectangle& other) const {
+    return weightToCostRatio_ < other.weightToCostRatio_;
   }
-  inline void setLabel(char c) {
-    m_label = c;
+
+  void setLabel(char label) {
+    label_ = label;
   }
 
   //-------------------------------------------
@@ -82,9 +90,7 @@ public:
 
   //--------------------------------------------------
   // Convenience function operating on type Rectangle*.
-  // Returns *r1 < *r2
+  // Returns *rect1 < *rect2
   //---------------------------------------------------
-  static bool better(const Rectangle* r1, const Rectangle* r2);
+  static bool better(const Rectangle* rect1, const Rectangle* rect2);
 };
-
-#endif // RECTANGLE_H
