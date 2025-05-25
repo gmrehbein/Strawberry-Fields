@@ -1,31 +1,35 @@
 // -----------------------------------------------------------
 //  File: optimizer.h
-//  Author: Gregory Rehbein
+//  Author: Gregory Rehbein (Modernized to C++23)
 //
 //  Copyright (C) 2012 Gregory Rehbein <gmrehbein@gmail.com>
 // -----------------------------------------------------------
 
-#ifndef OPTIMIZER_H
-#define OPTIMIZER_H
+#pragma once
 
-#include <stdint.h>
-#include <vector>
+#include <cstddef>
 #include <list>
-#include <boost/utility.hpp>
+#include <vector>
 #include <boost/dynamic_bitset.hpp>
 
+// Forward declaration
 class Rectangle;
 
-class Optimizer : boost::noncopyable
+class Optimizer
 {
 public:
-  Optimizer();
-  ~Optimizer();
+  // Rule of 5 (modern C++ best practice)
+  Optimizer() = default;
+  ~Optimizer() = default;
+  Optimizer(const Optimizer&) = delete;
+  Optimizer& operator=(const Optimizer&) = delete;
+  Optimizer(Optimizer&&) = default;
+  Optimizer& operator=(Optimizer&&) = default;
 
   //--------------------------------
   // Executes the optimizer.
   // Writes output to the file pathname
-  // contained in Global::outFile
+  // contained in Global::out_file
   //--------------------------------
   int run();
 
@@ -34,24 +38,23 @@ public:
   // on the maximum number of Rectangles
   // to consider
   //---------------------------------
-  void setMaxRectangles(int maxRectangles);
+  void set_max_rectangles(int max_rectangles) noexcept;
 
 private:
-  void generateRectangles();
-  void greedyMatch();
-  void localSearch();
-  void computeConvexHull();
+  void generate_rectangles();
+  void greedy_match();
+  void local_search();
+  void compute_convex_hull();
   void label();
-  void output();
-  void assertDisjoint();
+  void output() const;
+  void assert_disjoint() const;
   void reset();
-  Rectangle* findNextRectangle();
-  Rectangle* joinRectangles(const Rectangle*, const Rectangle*);
 
-  size_t m_maxRectangles;
-  std::vector<Rectangle* > m_rectangles;
-  std::list<Rectangle*> m_result;
-  boost::dynamic_bitset<> m_covering;
+  [[nodiscard]] Rectangle* find_next_rectangle();
+  [[nodiscard]] Rectangle* join_rectangles(const Rectangle* r1, const Rectangle* r2);
+
+  std::size_t max_rectangles_{0};
+  std::vector<Rectangle*> rectangles_;
+  std::list<Rectangle*> result_;
+  boost::dynamic_bitset<> covering_;
 };
-
-#endif

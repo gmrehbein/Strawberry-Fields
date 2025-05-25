@@ -1,21 +1,20 @@
 // -----------------------------------------------------------
 //  File: shade.cc
-//  Author: Gregory Rehbein
+//  Author: Gregory Rehbein (Modernized to C++23)
 //
 //  Copyright (C) 2012 Gregory Rehbein <gmrehbein@gmail.com>
 // -----------------------------------------------------------
 
-// Self
 #include "shade.h"
 
-// C
+#include <algorithm>
 #include <cassert>
+#include <ranges>
 
-// Local
 #include "rectangle.h"
 
-Shade::Shade(Rectangle* r1, Rectangle* r2, Rectangle* join)
-: rec1(r1), rec2(r2), join(join)
+Shade::Shade(Rectangle* r1, Rectangle* r2, Rectangle* join_rect)
+  : rec1(r1), rec2(r2), join(join_rect)
 {
   assert(rec1 != nullptr);
   assert(rec2 != nullptr);
@@ -30,31 +29,40 @@ Shade::Shade(Rectangle* r1, Rectangle* r2, Rectangle* join)
 //--------------------------------------------------
 int Shade::penalty() const
 {
-  int envelopeCost = 0;
-  int penumbraCost = 0;
-
-  for (auto rec : envelope) {
+  // Calculate envelope cost using ranges
+  const auto envelope_cost = std::ranges::fold_left(
+  envelope | std::views::transform([](const Rectangle* rec) {
     assert(rec != nullptr);
-    envelopeCost += rec->cost();
-  }
+    return rec->cost();
+  }),
+  0, std::plus<> {});
 
-  for (auto [original, slice] : penumbra) {
-    penumbraCost += original->area() - slice->area();
-  }
+  // Calculate penumbra cost using ranges
+  const auto penumbra_cost = std::ranges::fold_left(
+  penumbra | std::views::transform([](const auto& pair) {
+    const auto& [original, slice] = pair;
+    return original->area() - slice->area();
+  }),
+  0, std::plus<> {});
 
-  int penalty = join->cost() - (rec1->cost() + rec2->cost() + envelopeCost + penumbraCost);
-  return penalty;
+  const int penalty_value = join->cost() - (rec1->cost() + rec2->cost() +
+                            envelope_cost + penumbra_cost);
+  return penalty_value;
 }
 
 //----------------------------------------------
 // Ordinal function for the Shade class. If
 // two Shades have the same penalty, choose
-// the Shade that encompasses less rectangles
+// the Shade that encompasses fewer rectangles
 // in its envelope since that leaves more choices
-// for the optimizer's localSearch() to test
+// for the optimizer's local_search() to test
 //----------------------------------------------
-bool Shade::operator< (const Shade &other) const
+bool Shade::operator<(const Shade& other) const
 {
-  return penalty() == other.penalty() ?
-         envelope.size() < other.envelope.size() : penalty() < other.penalty();
+  const auto this_penalty = penalty();
+  const auto other_penalty = other.penalty();
+
+  return this_penalty == other_penalty
+         ? envelope.size() < other.envelope.size()
+         : this_penalty < other_penalty;
 }

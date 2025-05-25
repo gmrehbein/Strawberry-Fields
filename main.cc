@@ -1,119 +1,139 @@
 // -----------------------------------------------------------
 //  File: main.cc
-//  Author: Gregory Rehbein
+//  Author: Gregory Rehbein (Modernized to C++23)
 //
 //  Copyright (C) 2012 Gregory Rehbein <gmrehbein@gmail.com>
 // -----------------------------------------------------------
 
-// C
+#include <cctype>
 #include <cstdlib>
-
-// C++
-#include <iostream>
+#include <exception>
 #include <fstream>
-#include <vector>
+#include <iostream>
+#include <print>
+#include <ranges>
 #include <string>
+#include <string_view>
+#include <vector> // NOLINT(misc-include-cleaner)
 
-// Boost
 #include <boost/program_options.hpp>
 
-#include "optimizer.h"
 #include "global.h"
-
-using std::string;
-using std::cout;
-using std::ifstream;
-using std::ofstream;
-using std::make_pair;
-using std::vector;
-using std::ios_base;
+#include "optimizer.h"
 
 namespace po = boost::program_options;
 
+namespace
+{
+void process_field_line(std::string_view line, int row_index)
+{
+  std::vector<int> row;
+  row.reserve(line.size());
+
+  for (auto col_index : std::views::iota(0UZ, line.size())) {
+    const char ch = line[col_index];
+    if (ch == '.') {
+      row.push_back(0);
+    } else if (ch == '@') {
+      row.push_back(1);
+      Global::strawberries.emplace(row_index, static_cast<int>(col_index));
+    }
+  }
+
+  Global::field.push_back(std::move(row));
+}
+
+void process_strawberry_field(Optimizer& optimizer, int& total_cost)
+{
+  if (Global::field.empty()) return;
+
+  Global::num_rows = Global::field.size();
+  Global::num_columns = Global::field.at(0).size();
+  total_cost += optimizer.run();
+
+  // Reset for next field
+  Global::field.clear();
+  Global::strawberries.clear();
+  Global::num_rows = Global::num_columns = 0;
+}
+}
+
 int main(int argc, char* argv[])
 {
-// process options
+  // Process command line options
   po::options_description desc("Options");
   try {
     desc.add_options()
     ("help,h", "show help message")
-    ("file,f", po::value<string>
-     (&Global::inFile)->default_value("strawberries.txt"), "input file")
-    ("output,o", po::value<string>
-     (&Global::outFile)->default_value("optimal_covering.txt"), "output file");
+    ("file,f", po::value<std::string>(&Global::in_file)
+     ->default_value("strawberries.txt"), "input file")
+    ("output,o", po::value<std::string>(&Global::out_file)
+     ->default_value("optimal_covering.txt"), "output file");
 
     po::positional_options_description p;
     p.add("file", 1);
 
     po::variables_map vm;
-    po::store(po::command_line_parser(argc, argv).options(desc).positional(p).run(), vm);
+    po::store(po::command_line_parser(argc, argv)
+              .options(desc)
+              .positional(p)
+              .run(), vm);
     po::notify(vm);
 
     if (vm.count("help")) {
-      cout << "Usage: strawberryfields [options]\n";
-      cout << desc;
-      return 1;
+      std::println("Usage: strawberryfields [options]");
+      std::cout << desc;
+      return EXIT_SUCCESS;
     }
-  }
-
-  catch (std::exception& e) {
-    cout << e.what() << "\n";
-    cout << "Usage: strawberryfields [options]\n";
-    cout << desc;
-    return 1;
+  } catch (const std::exception& e) { // NOLINT(bugprone-empty-catch)
+    std::println("Error: {}", e.what());
+    std::println("Usage: strawberryfields [options]");
+    std::cout << desc;
+    return EXIT_FAILURE;
   }
 
   Optimizer optimizer;
-  int maxRectangles;
-  int totalCost = 0;
+  int total_cost = 0;
 
-// input arrays
-  ifstream strawberryFile(Global::inFile.c_str());
-  char line[52];
-  while (strawberryFile.getline(line, 52).good()) {
-    static int m = -1;  // row count
-    if (strawberryFile.gcount() > 1) {
-      if (isdigit(line[0])) {
-        maxRectangles = strtol(line, NULL, 10);
-        optimizer.setMaxRectangles(maxRectangles);
-      } else {
-        // read line into field
-        vector<int> row;
-        ++m;
-        int numColumns = strawberryFile.gcount() - 1;
-        row.reserve(numColumns);
-        for (int n = 0; n < numColumns; ++n) {
-          if ('.' == line[n])
-            row.push_back(0);
-          else if ('@' == line[n]) {
-            row.push_back(1);
-            Global::strawberries.insert(make_pair(m, n));
-          }
-        }
-        Global::field.push_back(row);
-        row.clear();
-      }
-    } else if (!Global::field.empty()) {
-      // we read a newline and are ready to
-      // process the strawberry patch
-      m = -1;
-      Global::numRows = Global::field.size();
-      Global::numColumns = Global::field.at(0).size();
-      totalCost += optimizer.run();
-      Global::field.clear();
-      Global::strawberries.clear();
-      Global::numRows = Global::numColumns = 0;
+  // Process input file
+  std::ifstream strawberry_file(Global::in_file);
+  if (!strawberry_file) {
+    std::println("Error: Cannot open input file '{}'", Global::in_file);
+    return EXIT_FAILURE;
+  }
+
+  std::string line;
+  int row_index = -1;
+
+  while (std::getline(strawberry_file, line)) {
+    if (line.empty()) {
+      // Empty line signals end of current field
+      process_strawberry_field(optimizer, total_cost);
+      row_index = -1;
+      continue;
+    }
+
+    if (std::isdigit(line[0])) {
+      // First line with digit is max rectangles constraint
+      const auto max_rectangles = std::stoi(line);
+      optimizer.set_max_rectangles(max_rectangles);
+    } else {
+      // Field data line
+      ++row_index;
+      process_field_line(line, row_index);
     }
   }
-  // handle the last field
-  if (strawberryFile.eof() && !Global::field.empty()) {
-    Global::numRows = Global::field.size();
-    Global::numColumns = Global::field.at(0).size();
-    totalCost += optimizer.run();
+
+  // Handle the last field if file doesn't end with empty line
+  if (!Global::field.empty()) {
+    process_strawberry_field(optimizer, total_cost);
   }
-  strawberryFile.close();
-  ofstream output(Global::outFile.c_str(), ios_base::out | ios_base::app);
-  output << "Total Cost: " << totalCost << "\n";
-  output.close();
-  return 0;
+
+  // Write total cost to output file
+  {
+    std::ofstream output(Global::out_file, std::ios_base::out | std::ios_base::app);
+    output << "Total Cost: " << total_cost << '\n';
+  }
+
+  return EXIT_SUCCESS;
 }
