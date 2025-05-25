@@ -13,14 +13,6 @@ using std::vector;
 using std::set;
 using std::pair;
 
-string Global::inFile;
-string Global::outFile;
-vector<vector<int> > Global::field;
-set<pair<int,int> > Global::strawberries;
-
-size_t Global::numRows = 0;
-size_t Global::numColumns = 0;
-
 size_t Global::weightOfRectangle
 (int topLeftRow, int topLeftColumn, int bottomRightRow, int bottomRightColumn)
 {
